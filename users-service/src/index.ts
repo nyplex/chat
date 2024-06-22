@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { app } from "./app";
 import { natsWrapper } from "./nats-wrapper";
+import { AuthCreatedListener } from "./events/listeners/auth-created-listener";
+import { AuthUpdatedListener } from "./events/listeners/auth-updated-listener";
 
 const start = async () => {
   console.log("Starting up...");
@@ -22,7 +24,6 @@ const start = async () => {
   if (!process.env.NATS_URL) {
     throw new Error("NATS_URL must be defined");
   }
-
   try {
     await natsWrapper.connect(
       process.env.NATS_CLUSTER_ID,
@@ -33,11 +34,15 @@ const start = async () => {
       console.log("NATS connection closed");
       process.exit();
     });
+
     process.on("SIGINT", () => natsWrapper.client.close());
     process.on("SIGTERM", () => natsWrapper.client.close());
 
+    new AuthCreatedListener(natsWrapper.client).listen();
+    new AuthUpdatedListener(natsWrapper.client).listen();
+
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("Auth Service Connected to MongoDB");
+    console.log("Auth Service Connected to MongoDB!!!");
   } catch (error) {
     console.error(error);
   }

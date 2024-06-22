@@ -4,6 +4,8 @@ import { jwtSign } from "../utils/jwt-sign";
 import { refreshTokenSign } from "../utils/refresh-token-sign";
 import { Auth } from "../models/auth";
 import { signupValidationRules } from "../validators/signup-validators";
+import { AuthCreatedPublisher } from "../events/publisher/auth-created-publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 const router = express.Router();
 
@@ -27,7 +29,7 @@ router.post(
       audience: Audience.User,
       refreshToken: null,
     });
-    await user.save();
+    // await user.save();
 
     // Create JWT tokens
     const token = jwtSign(user.id, user.email, Audience.User);
@@ -36,6 +38,13 @@ router.post(
     // Store the refresh token in the database
     user.set({ refreshToken });
     await user.save();
+
+    // Publish an event that the user has been created
+    new AuthCreatedPublisher(natsWrapper.client).publish({
+      userID: user.id,
+      email: user.email,
+      version: user.version,
+    });
 
     // Set the JWT token in the session and return the refresh token
     req.session = { jwt: token };

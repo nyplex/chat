@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Password } from "../utils/password";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 // An interface that describes the properties that are required to create a new User
 interface AuthAttrs {
@@ -20,6 +21,7 @@ interface AuthDoc extends mongoose.Document {
   password: string;
   refreshToken: string | null;
   audience: string;
+  version: number;
 }
 
 const authSchema = new mongoose.Schema(
@@ -49,11 +51,13 @@ const authSchema = new mongoose.Schema(
         delete ret._id;
         delete ret.password;
         delete ret.refreshToken;
-        delete ret.__v;
       },
     },
   }
 );
+
+authSchema.set("versionKey", "version");
+authSchema.plugin(updateIfCurrentPlugin);
 
 authSchema.pre("save", async function (done) {
   if (this.isModified("password")) {
@@ -72,6 +76,6 @@ authSchema.statics.build = (attrs: AuthAttrs) => {
   return new Auth(attrs);
 };
 
-const Auth = mongoose.model<AuthDoc, AuthModel>("User", authSchema);
+const Auth = mongoose.model<AuthDoc, AuthModel>("Authentication", authSchema);
 
 export { Auth };

@@ -3,18 +3,15 @@ import "express-async-errors";
 import bodyParser from "body-parser";
 import cookieSession from "cookie-session";
 import { json } from "body-parser";
-import { signupRoute } from "./routes/signup";
-import { signinRoute } from "./routes/signin";
-import { currentUserRoute } from "./routes/current-user";
 import cookieParser from "cookie-parser";
-import { getRefreshToken } from "./routes/refresh-token";
 import {
   NotFoundError,
   configureJwtStrategy,
   errorHandler,
 } from "@chat-dev/common";
-import { signoutRouter } from "./routes/signout";
-import { updateUserRouter } from "./routes/update-user";
+import { getUserRouter } from "./routes/get-user";
+import { putUserRouter } from "./routes/put-user";
+import { getUsersRouter } from "./routes/get-users";
 
 const app = express();
 
@@ -31,12 +28,10 @@ app.use(
 
 configureJwtStrategy(app, { secretOrKey: process.env.JWT_KEY! });
 
-app.use(signupRoute);
-app.use(signinRoute);
-app.use(currentUserRoute);
-app.use(getRefreshToken);
-app.use(signoutRouter);
-app.use(updateUserRouter);
+app.use(getUsersRouter);
+app.use(getUserRouter);
+app.use(putUserRouter);
+
 
 app.all("*", async (req, res, next) => {
   throw new NotFoundError();

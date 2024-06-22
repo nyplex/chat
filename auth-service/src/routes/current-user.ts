@@ -11,8 +11,8 @@ router.get(
   "/api/auth/currentuser",
   routeProtected(Audience.User),
   async (req, res) => {
-    const user = req.user as { email: string };
-    const currentUser = await Auth.findOne({ email: user.email });
+    const user = req.currentUser;
+    const currentUser = await Auth.findOne({ email: user?.email });
 
     res.send({ currentUser });
   }

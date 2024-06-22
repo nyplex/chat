@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-mongo-depl
+  name: users-mongo-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth-mongo
+      app: users-mongo
   template:
     metadata:
       labels:
-        app: auth-mongo
+        app: users-mongo
     spec:
       containers:
-        - name: auth-mongo
+        - name: users-mongo
           image: mongo
 
 --- 
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-mongo-srv
+  name: users-mongo-srv
 spec:
   selector:
-    app: auth-mongo
+    app: users-mongo
   ports:
-    - name: auth-mongo
+    - name: users-mongo
       protocol: TCP
       port: 27017
       targetPort: 27017
@@ -34,19 +34,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-mongo-express-depl
+  name: users-mongo-express-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth-mongo-express
+      app: users-mongo-express
   template:
     metadata:
       labels:
-        app: auth-mongo-express
+        app: users-mongo-express
     spec:
       containers:
-        - name: auth-mongo-express
+        - name: users-mongo-express
           image: mongo-express:latest
           env:
             - name: ME_CONFIG_BASICAUTH_USERNAME
@@ -54,9 +54,9 @@ spec:
             - name: ME_CONFIG_BASICAUTH_PASSWORD
               value: "password"
             - name: ME_CONFIG_MONGODB_SERVER
-              value: "auth-mongo-srv"
+              value: "users-mongo-srv"
             - name: ME_CONFIG_SITE_BASEURL
-              value: "/mongo-express/auth"
+              value: "/mongo-express/users"
           ports:
             - containerPort: 8081
 
@@ -64,10 +64,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-mongo-express-srv
+  name: users-mongo-express-srv
 spec:
   selector:
-    app: auth-mongo-express
+    app: users-mongo-express
   ports:
     - protocol: TCP
       port: 8081

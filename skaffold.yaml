@@ -17,6 +17,14 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: nyplex/chat-users
+      context: users-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
     - image: nyplex/chat-client
       context: client
       docker:

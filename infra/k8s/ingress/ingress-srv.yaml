@@ -10,7 +10,14 @@ spec:
     - host: chat.dev
       http:
         paths:
-          - path: /mongo-express
+          - path: /mongo-express/users
+            pathType: Prefix
+            backend:
+              service:
+                name: users-mongo-express-srv
+                port:
+                  number: 8081
+          - path: /mongo-express/auth
             pathType: Prefix
             backend:
               service:
@@ -22,6 +29,13 @@ spec:
             backend:
               service:
                 name: auth-srv
+                port:
+                  number: 3000
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: users-srv
                 port:
                   number: 3000
           - path: /?(.*)

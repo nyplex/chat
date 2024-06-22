@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: users-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: users
   template:
     metadata:
       labels:
-        app: auth
+        app: users
     spec:
       containers:
-        - name: auth
-          image: nyplex/chat-auth
+        - name: users
+          image: nyplex/chat-users
           env:
             - name: MONGO_URI
-              value: "mongodb://auth-mongo-srv:27017/auth"
+              value: "mongodb://users-mongo-srv:27017/users"
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
@@ -41,12 +41,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: users-srv
 spec:
   selector:
-    app: auth
+    app: users
   ports:
-    - name: auth
+    - name: users
       protocol: TCP
       port: 3000
       targetPort: 3000
